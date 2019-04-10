@@ -37,7 +37,7 @@ DEPLOY_RELID = $(shell date -u +%Y%m%d%H%M%S)
 
 deploy_rootdir ?= $$HOME/app
 deploy_relrootdir ?= $(deploy_rootdir)/rel
-deploy_reldir ?= $(deploy_relrootdir)/$(DEPLOY_RELID)
+deploy_prefix ?= $(deploy_relrootdir)/$(DEPLOY_RELID)
 deploy_srcdir ?= $(deploy_rootdir)/src
 
 
@@ -76,14 +76,14 @@ deploy_srcdir ?= $(deploy_rootdir)/src
 REMOTE_DEPLOY_COMMAND =\
 set -e; \
 cd $(deploy_srcdir); \
-make prefix=$(deploy_reldir); \
+make prefix=$(deploy_prefix); \
 if sudo -v 2> /dev/null; then \
-  sudo make prefix=$(deploy_reldir) install; \
+  sudo make prefix=$(deploy_prefix) install; \
   if [ -d $(deploy_relrootdir) ]; then \
     sudo ln -sfn $(DEPLOY_RELID) $(deploy_relrootdir)/current; \
   fi; \
 else \
-  make prefix=$(deploy_reldir) install; \
+  make prefix=$(deploy_prefix) install; \
   if [ -d $(deploy_relrootdir) ]; then \
     ln -sfn $(DEPLOY_RELID) $(deploy_relrootdir)/current; \
   fi; \
