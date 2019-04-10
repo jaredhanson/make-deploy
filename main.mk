@@ -35,10 +35,10 @@ DEPLOY_REPO ?= $(shell git remote -v show -n origin | awk '/Fetch/{ print $$3 }'
 # [1]: https://12factor.net/build-release-run
 DEPLOY_RELID = $(shell date -u +%Y%m%d%H%M%S)
 
-deploy_prefix ?= $$HOME/app
-deploy_relrootdir ?= $(deploy_prefix)/rel
+deploy_rootdir ?= $$HOME/app
+deploy_relrootdir ?= $(deploy_rootdir)/rel
 deploy_reldir ?= $(deploy_relrootdir)/$(DEPLOY_RELID)
-deploy_srcdir ?= $(deploy_prefix)/src
+deploy_srcdir ?= $(deploy_rootdir)/src
 
 
 
