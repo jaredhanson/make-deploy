@@ -1,0 +1,26 @@
+{
+  "name": "make-deploy",
+  "version": "0.1.0",
+  "description": "Useful makefiles for deploying applications.",
+  "keywords": [
+    "make"
+  ],
+  "author": {
+    "name": "Jared Hanson",
+    "email": "jaredhanson@gmail.com",
+    "url": "http://www.jaredhanson.net/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jaredhanson/make-deploy.git"
+  },
+  "bugs": {
+    "url": "http://github.com/jaredhanson/make-deploy/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/MIT"
+    }
+  ]
+}
