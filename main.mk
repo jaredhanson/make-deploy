@@ -4,7 +4,7 @@ include $(__MAKE_DEPLOY_DIR)/lib/host.mk
 
 
 DEPLOY_SUPERUSER ?= root
-DEPLOY_USER ?= $(PACKAGE_NAME)
+DEPLOY_USER ?= $(PACKAGE)
 DEPLOY_SUDO ?= 0
 
 DEPLOY_ID ?= ~/.ssh/id_rsa.pub
