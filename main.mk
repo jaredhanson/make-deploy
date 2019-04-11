@@ -5,7 +5,6 @@ include $(__MAKE_DEPLOY_DIR)/lib/host.mk
 
 DEPLOY_SUPERUSER ?= root
 DEPLOY_USER ?= $(PACKAGE)
-DEPLOY_SUDO ?= 0
 
 DEPLOY_ID ?= ~/.ssh/id_rsa.pub
 DEPLOY_KEY ?= $(shell cat $(DEPLOY_ID))
@@ -167,16 +166,7 @@ sync: $(patsubst %, sync@%, $(subst :,!,$(HOSTS)))
 #   - Install `make` if it is not already installed.  `make` is required by the
 #     deploy system in order to compile and install an application.
 #   - If the user the application will run as does not exist, create a new user
-#     as a system account (as indicated by the -r option), and...
-#   - If the user the application will run as should be permitted to execute
-#     commands as the superuser, grant them sudo privileges, otherwise...
-#   - Enable user lingering so that the user can run long-running services when
-#     not logged in.
-#
-# Granting sudo privledges to the user (by setting `DEPLOY_SUDO`) is NOT
-# recommended.  Instead, the application should be deployed and run as a
-# separate user, in order to protect against adverse consequences of a security
-# breach or accidental misbehavior.
+#     as a system account (as indicated by the -r option).
 REMOTE_PREPARE_COMMAND =\
 set -e; \
 if ! type make &> /dev/null; then \
@@ -184,13 +174,6 @@ if ! type make &> /dev/null; then \
 fi; \
 if ! id -u $(1) &> /dev/null; then \
   sudo useradd -r -m $(1); \
-  if [ "$(2)" -eq "1" ]; then \
-    sudo usermod -aG sudo $(1); \
-  else \
-    if type loginctl &> /dev/null; then \
-      sudo loginctl enable-linger $(1); \
-    fi; \
-  fi; \
 fi;
 
 # Prepare remote host.
@@ -213,7 +196,7 @@ fi;
 # [1]: https://www.nixu.com/blog/things-security-auditors-will-nag-about-part-2-lets-run-root
 prepare@%:
 	@echo "Preparing $(subst !,:,$*)..."
-	ssh $(SSHFLAGS) $(call sshhost,$(subst !,:,$*),$(DEPLOY_SUPERUSER),1) '$(call REMOTE_PREPARE_COMMAND,$(call user,$(subst !,:,$*),$(DEPLOY_USER)),$(DEPLOY_SUDO))'
+	ssh $(SSHFLAGS) $(call sshhost,$(subst !,:,$*),$(DEPLOY_SUPERUSER),1) '$(call REMOTE_PREPARE_COMMAND,$(call user,$(subst !,:,$*),$(DEPLOY_USER)))'
 	@$(MAKE) copy-id@$*
 	@$(MAKE) predeploy@$*
 
