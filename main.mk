@@ -35,8 +35,7 @@ DEPLOY_REPO ?= $(shell git remote -v show -n origin | awk '/Fetch/{ print $$3 }'
 DEPLOY_RELID = $(shell date -u +%Y%m%d%H%M%S)
 
 deploy_rootdir ?= /app/$(PACKAGE)
-deploy_relrootdir ?= $(deploy_rootdir)/rel
-deploy_prefix ?= $(deploy_relrootdir)/$(DEPLOY_RELID)
+deploy_prefix ?= $(deploy_rootdir)/$(DEPLOY_RELID)
 deploy_srcdir ?= $$HOME/app/src
 
 
@@ -81,8 +80,8 @@ REMOTE_DEPLOY_INSTALL_COMMAND =\
 set -e; \
 cd $(subst $$HOME,~$(1),$(deploy_srcdir)); \
 sudo make prefix=$(deploy_prefix) install; \
-if [ -d $(deploy_relrootdir) ]; then \
-  sudo ln -sfn $(DEPLOY_RELID) $(deploy_relrootdir)/current; \
+if [ -d $(deploy_rootdir)/$(DEPLOY_RELID) ]; then \
+  sudo ln -sfn $(DEPLOY_RELID) $(deploy_rootdir)/current; \
 fi;
 
 # TODO: After deploy, remove old releases beyond a configurable threshold.
