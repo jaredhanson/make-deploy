@@ -82,7 +82,8 @@ cd $(subst $$HOME,~$(1),$(deploy_srcdir)); \
 sudo make prefix=$(deploy_prefix) install; \
 if [ -d $(deploy_rootdir)/$(DEPLOY_RELID) ]; then \
   sudo ln -sfn $(DEPLOY_RELID) $(deploy_rootdir)/current; \
-fi;
+fi; \
+sudo make restart;
 
 # TODO: After deploy, remove old releases beyond a configurable threshold.
 # TODO: implement a rollback target
