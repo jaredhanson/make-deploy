@@ -34,10 +34,10 @@ DEPLOY_REPO ?= $(shell git remote -v show -n origin | awk '/Fetch/{ print $$3 }'
 # [1]: https://12factor.net/build-release-run
 DEPLOY_RELID = $(shell date -u +%Y%m%d%H%M%S)
 
-deploy_rootdir ?= $$HOME/app
+deploy_rootdir ?= /app/$(PACKAGE)
 deploy_relrootdir ?= $(deploy_rootdir)/rel
 deploy_prefix ?= $(deploy_relrootdir)/$(DEPLOY_RELID)
-deploy_srcdir ?= $(deploy_rootdir)/src
+deploy_srcdir ?= $$HOME/app/src
 
 
 
@@ -72,20 +72,17 @@ deploy_srcdir ?= $(deploy_rootdir)/src
 # [3]: https://docs.snapcraft.io/the-system-snap-directory/2817
 # [4]: https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPFrameworks/Concepts/FrameworkAnatomy.html
 # [5]: https://capistranorb.com/documentation/getting-started/structure/
-REMOTE_DEPLOY_COMMAND =\
+REMOTE_DEPLOY_BUILD_COMMAND =\
 set -e; \
 cd $(deploy_srcdir); \
-make prefix=$(deploy_prefix); \
-if sudo -v 2> /dev/null; then \
-  sudo make prefix=$(deploy_prefix) install; \
-  if [ -d $(deploy_relrootdir) ]; then \
-    sudo ln -sfn $(DEPLOY_RELID) $(deploy_relrootdir)/current; \
-  fi; \
-else \
-  make prefix=$(deploy_prefix) install; \
-  if [ -d $(deploy_relrootdir) ]; then \
-    ln -sfn $(DEPLOY_RELID) $(deploy_relrootdir)/current; \
-  fi; \
+make prefix=$(deploy_prefix);
+
+REMOTE_DEPLOY_INSTALL_COMMAND =\
+set -e; \
+cd $(subst $$HOME,~$(1),$(deploy_srcdir)); \
+sudo make prefix=$(deploy_prefix) install; \
+if [ -d $(deploy_relrootdir) ]; then \
+  sudo ln -sfn $(DEPLOY_RELID) $(deploy_relrootdir)/current; \
 fi;
 
 # TODO: After deploy, remove old releases beyond a configurable threshold.
@@ -100,7 +97,8 @@ fi;
 deploy@%:
 	@$(MAKE) sync@$*
 	@echo "Deploying to $(subst !,:,$*)..."
-	ssh $(SSHFLAGS) $(call sshhost,$(subst !,:,$*),$(DEPLOY_USER)) '$(REMOTE_DEPLOY_COMMAND)'
+	ssh $(SSHFLAGS) $(call sshhost,$(subst !,:,$*),$(DEPLOY_USER)) '$(REMOTE_DEPLOY_BUILD_COMMAND)'
+	ssh $(SSHFLAGS) $(call sshhost,$(subst !,:,$*),$(DEPLOY_SUPERUSER),1) '$(call REMOTE_DEPLOY_INSTALL_COMMAND,$(call user,$(subst !,:,$*),$(DEPLOY_USER)))'
 
 # Deploy on all remote hosts.
 #
@@ -285,6 +283,9 @@ sudo make preinstall;
 # keep system-wide dependencies to a minimum and prefer [dependency
 # isolation][2].  Dependencies which are commonly needed, and suitable for
 # system-wide installation, include the language runtime and dependency manager.
+#
+# These commands are executed as the superuser on the remote machine, in order
+# to obtain the necessary privileges to complete successfully.
 #
 # [1]: https://blog.heroku.com/the_new_heroku_4_erosion_resistance_explicit_contracts
 # [2]: https://12factor.net/dependencies
