@@ -167,8 +167,12 @@ sync: $(patsubst %, sync@%, $(subst :,!,$(HOSTS)))
 #     as a system account (as indicated by the -r option).
 REMOTE_PREPARE_COMMAND =\
 set -e; \
+sudo apt-get update; \
 if ! type make &> /dev/null; then \
-  sudo apt-get install make; \
+  sudo apt-get -y install make; \
+fi; \
+if ! type git &> /dev/null; then \
+  sudo apt-get -y install git; \
 fi; \
 if ! id -u $(1) &> /dev/null; then \
   sudo useradd -r -m $(1); \
