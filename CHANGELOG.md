@@ -7,8 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [0.1.2] - 2019-04-10
+### Changed
+- Renamed deploy_prefix variable to deploy_rootdir and deploy_reldir variable
+to deploy_prefix.
 
 ## [0.1.1] - 2019-04-10
+### Changed
+- Renamed PACKAGE_NAME variable to PACKAGE, to match Autoconf conventions.
 
 ## [0.1.0] - 2019-04-09
 
