@@ -40,7 +40,7 @@ deploy_srcdir ?= $$HOME/app/src
 
 
 
-# The following list of commands is execeuted on a remote machine when deploying
+# The following list of commands is executed on a remote machine when deploying
 # the application.
 #
 #   - Invoke the [standard targets][1] (`make` and `make install`) for compiling
