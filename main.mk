@@ -13,6 +13,7 @@ DEPLOY_KEY_DATA ?= $(shell cat $(DEPLOY_ID) | awk '{print $$2}')
 # If it's not already set, dynamically determine the URL of the revision
 # control system repository.
 DEPLOY_REPO ?= $(shell git remote -v show -n origin | awk '/Fetch/{ print $$3 }')
+DEPLOY_BRANCH ?= $(shell git remote -v show -n origin | awk '/Remote branch/{ getline; gsub(/ /,""); print $$0 }')
 
 # Assign a release number to this deployment.  This release is assigned by the
 # deploy system, and is distinct from the version of the application and the
@@ -134,7 +135,7 @@ if [ ! -d $(deploy_srcdir) ]; then \
 else \
   cd $(deploy_srcdir); \
   git fetch --depth=1 origin; \
-  git reset --hard origin/master; \
+  git reset --hard origin/$(DEPLOY_BRANCH); \
   git clean -fdx; \
 fi;
 
