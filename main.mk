@@ -225,6 +225,9 @@ prepare: $(patsubst %, prepare@%, $(subst :,!,$(HOSTS)))
 #     application.
 #   - Remove any access to group and other users.
 #   - Add the key as an authorized key, if it is not already authorized.
+#
+# NOTE: use of tee after pipe do to redirection.  see man sudo_root
+# TODO: Document this work around better
 REMOTE_COPY_ID_COMMAND =\
 set -e; \
 sudo -u $(1) mkdir -p ~$(1)/.ssh; \
@@ -232,7 +235,7 @@ sudo chmod go= ~$(1)/.ssh; \
 sudo -u $(1) touch ~$(1)/.ssh/authorized_keys; \
 sudo chmod go= ~$(1)/.ssh/authorized_keys; \
 if ! sudo grep [[:blank:]]$(DEPLOY_KEY_DATA)[[:blank:]] ~$(1)/.ssh/authorized_keys &> /dev/null; then \
-  sudo echo $(DEPLOY_KEY) >> ~$(1)/.ssh/authorized_keys; \
+  sudo echo $(DEPLOY_KEY) | sudo -u $(1) tee ~$(1)/.ssh/authorized_keys; \
 fi;
 
 # Copy SSH key to remote host.
